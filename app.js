@@ -1,6 +1,6 @@
 /* ── PolyHedge App ── */
 
-const POLY_API = 'https://gamma-api.polymarket.com/markets';
+const POLY_API = 'https://corsproxy.io/?url=https://gamma-api.polymarket.com/markets';
 const FETCH_LIMIT = 500;
 
 // ── State ──
@@ -54,7 +54,8 @@ async function fetchAllMarkets() {
   const batch = 100;
 
   while (markets.length < FETCH_LIMIT) {
-    const url = `${POLY_API}?limit=${batch}&offset=${offset}&active=true&closed=false&order=volume&ascending=false`;
+    const target = `https://gamma-api.polymarket.com/markets?limit=${batch}&offset=${offset}&active=true&closed=false&order=volume&ascending=false`;
+    const url = `https://corsproxy.io/?url=${encodeURIComponent(target)}`;
     const r = await fetch(url, {
       headers: { 'Accept': 'application/json', 'Origin': 'https://polymarket.com' }
     });
