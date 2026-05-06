@@ -45,40 +45,25 @@ document.getElementById('liqFilter').addEventListener('click', e => {
 
 scanBtn.addEventListener('click', scan);
 
-// ── Fetch with multiple proxy fallbacks ──
-async function fetchWithProxy(targetUrl) {
-  const proxies = [
-    u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
-    u => `https://corsproxy.io/?url=${encodeURIComponent(u)}`,
-    u => `https://proxy.cors.sh/${u}`,
-  ];
-
-  for (const makeUrl of proxies) {
-    try {
-      const r = await fetch(makeUrl(targetUrl), {
-        headers: { 'Accept': 'application/json' },
-        signal: AbortSignal.timeout(10000),
-      });
-      if (!r.ok) continue;
-      const data = await r.json();
-      if (data) return data;
-    } catch {}
-  }
-  return null;
-}
-
+// ── Fetch via Vercel serverless function ──
 async function fetchAllMarkets() {
   const markets = [];
   let offset = 0;
   const batch = 100;
 
   while (markets.length < FETCH_LIMIT) {
-    const target = `https://gamma-api.polymarket.com/markets?limit=${batch}&offset=${offset}&active=true&closed=false&order=volume&ascending=false`;
-    const data = await fetchWithProxy(target);
-    if (!data || !Array.isArray(data) || !data.length) break;
-    markets.push(...data);
-    offset += batch;
-    if (data.length < batch) break;
+    try {
+      const r = await fetch(`/api/markets?limit=${batch}&offset=${offset}`, {
+        headers: { 'Accept': 'application/json' },
+        signal: AbortSignal.timeout(15000),
+      });
+      if (!r.ok) break;
+      const data = await r.json();
+      if (!data || !Array.isArray(data) || !data.length) break;
+      markets.push(...data);
+      offset += batch;
+      if (data.length < batch) break;
+    } catch { break; }
   }
   return markets;
 }
