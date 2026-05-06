@@ -1,6 +1,5 @@
 /* ── PolyHedge App ── */
 
-const POLY_API = 'https://corsproxy.io/?url=https://gamma-api.polymarket.com/markets';
 const FETCH_LIMIT = 500;
 
 // ── State ──
@@ -18,7 +17,6 @@ const distanceVal    = document.getElementById('distanceVal');
 const scanBtn        = document.getElementById('scanBtn');
 const resultsEl      = document.getElementById('results');
 const statsBar       = document.getElementById('statsBar');
-const emptyState     = document.getElementById('emptyState');
 
 // ── Controls ──
 distanceSlider.addEventListener('input', () => {
@@ -47,7 +45,28 @@ document.getElementById('liqFilter').addEventListener('click', e => {
 
 scanBtn.addEventListener('click', scan);
 
-// ── Fetch ──
+// ── Fetch with multiple proxy fallbacks ──
+async function fetchWithProxy(targetUrl) {
+  const proxies = [
+    u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+    u => `https://corsproxy.io/?url=${encodeURIComponent(u)}`,
+    u => `https://proxy.cors.sh/${u}`,
+  ];
+
+  for (const makeUrl of proxies) {
+    try {
+      const r = await fetch(makeUrl(targetUrl), {
+        headers: { 'Accept': 'application/json' },
+        signal: AbortSignal.timeout(10000),
+      });
+      if (!r.ok) continue;
+      const data = await r.json();
+      if (data) return data;
+    } catch {}
+  }
+  return null;
+}
+
 async function fetchAllMarkets() {
   const markets = [];
   let offset = 0;
@@ -55,13 +74,8 @@ async function fetchAllMarkets() {
 
   while (markets.length < FETCH_LIMIT) {
     const target = `https://gamma-api.polymarket.com/markets?limit=${batch}&offset=${offset}&active=true&closed=false&order=volume&ascending=false`;
-    const url = `https://corsproxy.io/?url=${encodeURIComponent(target)}`;
-    const r = await fetch(url, {
-      headers: { 'Accept': 'application/json', 'Origin': 'https://polymarket.com' }
-    });
-    if (!r.ok) break;
-    const data = await r.json();
-    if (!data || !data.length) break;
+    const data = await fetchWithProxy(target);
+    if (!data || !Array.isArray(data) || !data.length) break;
     markets.push(...data);
     offset += batch;
     if (data.length < batch) break;
@@ -164,7 +178,7 @@ function filterMarkets(markets) {
     if (volume < 1000) continue;
 
     const timeLeft = parseTimeLeft(m.endDate);
-    if (!timeLeft) continue; // already ended
+    if (!timeLeft) continue;
     if (timeLeft.days > state.maxDays) continue;
 
     const cost = calcCost(prices.yes, prices.no);
@@ -268,6 +282,7 @@ async function scan() {
   try {
     state.markets = await fetchAllMarkets();
     document.getElementById('statTotal').textContent = state.markets.length;
+    if (!state.markets.length) throw new Error('no data');
     const filtered = filterMarkets(state.markets);
     renderResults(filtered);
   } catch (err) {
