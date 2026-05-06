@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PolyHedge — Risk-Free Volume Scanner</title>
+  <meta name="description" content="Find the closest 50/50 markets on Polymarket. Hedge both sides, farm volume, earn the airdrop." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="noise"></div>
+
+  <header>
+    <div class="logo">
+      <span class="logo-mark">◈</span>
+      <span class="logo-text">PolyHedge</span>
+    </div>
+    <div class="header-right">
+      <span class="live-dot"></span>
+      <span class="live-label">LIVE</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>Hedge Both Sides.<br /><em>Farm the Airdrop.</em></h1>
+      <p class="hero-sub">
+        Closest 50/50 markets on Polymarket — sorted by proximity, filtered by liquidity.
+        Buy YES + NO on the same market. Zero directional risk.
+      </p>
+
+      <div class="controls">
+        <div class="control-group">
+          <label>Max distance from 50¢</label>
+          <div class="slider-row">
+            <input type="range" id="distanceSlider" min="1" max="20" value="10" />
+            <span class="slider-val" id="distanceVal">10¢</span>
+          </div>
+        </div>
+        <div class="control-group">
+          <label>Expires within</label>
+          <div class="pill-group" id="daysFilter">
+            <button class="pill" data-days="1">24h</button>
+            <button class="pill" data-days="3">3d</button>
+            <button class="pill active" data-days="7">7d</button>
+            <button class="pill" data-days="30">30d</button>
+            <button class="pill" data-days="9999">All</button>
+          </div>
+        </div>
+        <div class="control-group">
+          <label>Min liquidity</label>
+          <div class="pill-group" id="liqFilter">
+            <button class="pill active" data-liq="5000">$5K</button>
+            <button class="pill" data-liq="10000">$10K</button>
+            <button class="pill" data-liq="50000">$50K</button>
+          </div>
+        </div>
+        <button class="scan-btn" id="scanBtn">
+          <span class="scan-icon">⟳</span> Scan Markets
+        </button>
+      </div>
+    </section>
+
+    <section class="stats-bar" id="statsBar" style="display:none">
+      <div class="stat">
+        <span class="stat-val" id="statTotal">—</span>
+        <span class="stat-label">markets scanned</span>
+      </div>
+      <div class="stat-sep">|</div>
+      <div class="stat">
+        <span class="stat-val" id="statFound">—</span>
+        <span class="stat-label">matches found</span>
+      </div>
+      <div class="stat-sep">|</div>
+      <div class="stat">
+        <span class="stat-val" id="statBest">—</span>
+        <span class="stat-label">best spread</span>
+      </div>
+      <div class="stat-sep">|</div>
+      <div class="stat">
+        <span class="stat-val" id="statTime">—</span>
+        <span class="stat-label">last updated</span>
+      </div>
+    </section>
+
+    <section class="results" id="results">
+      <div class="empty-state" id="emptyState">
+        <div class="empty-icon">◈</div>
+        <p>Hit <strong>Scan Markets</strong> to find opportunities.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>Not financial advice. Do your own research.</span>
+    <span class="footer-sep">·</span>
+    <span>Data from <a href="https://polymarket.com" target="_blank">Polymarket</a></span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
