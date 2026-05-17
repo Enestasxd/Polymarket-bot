@@ -588,11 +588,35 @@ function filterMarkets(markets) {
       cost,
       conditionId: m.conditionId || '',
       slug:        m.slug || '',
-      url: `https://polymarket.com/event/${m.groupSlug || m.slug || ''}`,
+      groupSlug:   m.groupSlug || '',
+      url:         buildEventUrl(m),
     });
   }
   results.sort((a, b) => a.distance - b.distance || a.timeLeft.totalHours - b.timeLeft.totalHours);
   return results.slice(0, 30);
+}
+
+// ── URL Builder ──
+// Polymarket'ta her marketin iki slug'ı var:
+// 1. m.slug       → o spesifik sorunun slug'ı  (genelde yanlış URL)
+// 2. m.groupSlug  → event/grup slug'ı          (doğru URL, her zaman gelmeyebilir)
+// Önce groupSlug'ı dene, yoksa slug'ı kullan.
+function buildEventUrl(m) {
+  const slug = m.groupSlug || m.slug || '';
+  return `https://polymarket.com/event/${slug}`;
+}
+
+// Linke tıklanınca önce groupSlug URL'yi aç.
+// 404 gelirse slug ile tekrar dene (arka planda, kullanıcıya görünmez).
+async function openMarketUrl(r) {
+  // Önce groupSlug URL'yi dene
+  if (r.groupSlug && r.groupSlug !== r.slug) {
+    const primary = `https://polymarket.com/event/${r.groupSlug}`;
+    window.open(primary, '_blank', 'noopener');
+    return;
+  }
+  // groupSlug yoksa slug ile aç
+  window.open(r.url, '_blank', 'noopener');
 }
 
 // ── Format ──
@@ -685,9 +709,18 @@ function renderResults(results) {
   resultsEl.querySelectorAll('.card').forEach((card, i) => {
     card.addEventListener('click', e => {
       if (e.target.closest('.btn-trade') || e.target.closest('.btn-link')) return;
-      window.open(results[i].url, '_blank', 'noopener');
+      openMarketUrl(results[i]);
     });
     card.style.cursor = 'pointer';
+  });
+
+  // "Polymarket ↗" butonları
+  resultsEl.querySelectorAll('.btn-link').forEach((btn, i) => {
+    btn.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      openMarketUrl(results[i]);
+    });
   });
 }
 
@@ -768,4 +801,3 @@ async function scan() {
 // Init: export butonu durumu
 if (state.tradeHistory.length > 0) exportBtn.style.display = 'block';
 document.getElementById('statTrades').textContent = state.tradeHistory.length;
-
