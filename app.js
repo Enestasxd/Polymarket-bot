@@ -859,6 +859,7 @@ const followBtn     = document.getElementById('followBtn');
 enterBtn.addEventListener('click', () => {
   if (enterBtn.disabled || enterBtn.classList.contains('locked')) return;
   if (!window.visitedX || !window.visitedYt) return;
+  localStorage.setItem('polyhedge_unlocked', '1');
   splashOverlay.classList.add('hidden');
   setTimeout(() => splashOverlay.style.display = 'none', 400);
 });
