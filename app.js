@@ -597,25 +597,17 @@ function filterMarkets(markets) {
 }
 
 // ── URL Builder ──
-// Polymarket'ta her marketin iki slug'ı var:
-// 1. m.slug       → o spesifik sorunun slug'ı  (genelde yanlış URL)
-// 2. m.groupSlug  → event/grup slug'ı          (doğru URL, her zaman gelmeyebilir)
-// Önce groupSlug'ı dene, yoksa slug'ı kullan.
+// Doğru URL m.events[0].slug içinde geliyor.
+// Örnek: m.slug = "new-rhianna-album-before-gta-vi-926" (yanlış)
+//        m.events[0].slug = "what-will-happen-before-gta-vi" (doğru ✓)
 function buildEventUrl(m) {
-  const slug = m.groupSlug || m.slug || '';
+  const eventSlug = m.events && m.events[0] && m.events[0].slug;
+  const slug = eventSlug || m.groupSlug || m.slug || '';
   return `https://polymarket.com/event/${slug}`;
 }
 
-// Linke tıklanınca önce groupSlug URL'yi aç.
-// 404 gelirse slug ile tekrar dene (arka planda, kullanıcıya görünmez).
+// URL'yi aç — her zaman buildEventUrl sonucunu kullan
 async function openMarketUrl(r) {
-  // Önce groupSlug URL'yi dene
-  if (r.groupSlug && r.groupSlug !== r.slug) {
-    const primary = `https://polymarket.com/event/${r.groupSlug}`;
-    window.open(primary, '_blank', 'noopener');
-    return;
-  }
-  // groupSlug yoksa slug ile aç
   window.open(r.url, '_blank', 'noopener');
 }
 
