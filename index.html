@@ -19,10 +19,107 @@
       <span class="logo-text">PolyHedge</span>
     </div>
     <div class="header-right">
-      <span class="live-dot"></span>
+      <span class="refresh-countdown" id="refreshCountdown"></span>
+      <span class="live-dot" id="liveDot"></span>
       <span class="live-label">LIVE</span>
+      <button class="icon-btn" id="settingsBtn" title="Settings">⚙</button>
+      <button class="icon-btn export-btn" id="exportBtn" title="Export CSV" style="display:none">↓ CSV</button>
     </div>
   </header>
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="settingsOverlay">
+    <div class="modal" id="settingsModal">
+      <div class="modal-header">
+        <span class="modal-title">⚙ Settings</span>
+        <button class="modal-close" id="settingsClose">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Telegram -->
+        <div class="settings-section">
+          <div class="settings-section-title">📬 Telegram Onayı</div>
+          <p class="settings-desc">Bot bir fırsat bulduğunda sana Telegram'dan sorar. Sen onaylayınca trade atar.</p>
+          <div class="input-group">
+            <label>Bot Token</label>
+            <input type="text" id="tgToken" placeholder="1234567890:ABCdef..." autocomplete="off" />
+          </div>
+          <div class="input-group">
+            <label>Chat ID</label>
+            <input type="text" id="tgChatId" placeholder="-100123456789 veya kişisel ID" autocomplete="off" />
+          </div>
+          <button class="btn-secondary" id="testTgBtn">Test Mesajı Gönder</button>
+          <span class="tg-status" id="tgStatus"></span>
+        </div>
+
+        <!-- Wallet A -->
+        <div class="settings-section">
+          <div class="settings-section-title">💼 Cüzdan A — YES tarafı</div>
+          <p class="settings-desc">Bu cüzdan YES pozisyonu alır.</p>
+          <div class="input-group">
+            <label>Private Key</label>
+            <input type="password" id="walletAKey" placeholder="0x..." autocomplete="off" />
+          </div>
+          <div class="input-group">
+            <label>Adres (otomatik dolar)</label>
+            <input type="text" id="walletAAddr" placeholder="0x..." readonly />
+          </div>
+        </div>
+
+        <!-- Wallet B -->
+        <div class="settings-section">
+          <div class="settings-section-title">💼 Cüzdan B — NO tarafı</div>
+          <p class="settings-desc">Bu cüzdan NO pozisyonu alır. Farklı IP / cihazdan fund'lanmış olmalı.</p>
+          <div class="input-group">
+            <label>Private Key</label>
+            <input type="password" id="walletBKey" placeholder="0x..." autocomplete="off" />
+          </div>
+          <div class="input-group">
+            <label>Adres (otomatik dolar)</label>
+            <input type="text" id="walletBAddr" placeholder="0x..." readonly />
+          </div>
+        </div>
+
+        <!-- Trade Amount -->
+        <div class="settings-section">
+          <div class="settings-section-title">💰 İşlem Tutarı</div>
+          <div class="input-group">
+            <label>Her cüzdandan USDC miktarı ($)</label>
+            <input type="number" id="tradeAmount" value="100" min="10" max="500" />
+          </div>
+          <p class="settings-desc">Her iki cüzdana da bu kadar girilir. Toplam exposure: 2×</p>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-primary" id="saveSettingsBtn">Kaydet</button>
+        </div>
+
+        <div class="settings-warning">
+          ⚠ Private key'ler sadece tarayıcı localStorage'ında tutulur, hiçbir sunucuya gönderilmez.
+          Yine de bu aracı sadece kendi bilgisayarında çalıştır; paylaşılan / public cihazlarda kullanma.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trade Confirm Modal -->
+  <div class="modal-overlay" id="tradeOverlay">
+    <div class="modal" id="tradeModal">
+      <div class="modal-header">
+        <span class="modal-title">🔀 Trade Onayla</span>
+        <button class="modal-close" id="tradeClose">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="trade-market-q" id="tradeQuestion"></div>
+        <div class="trade-details" id="tradeDetails"></div>
+        <div class="trade-actions">
+          <button class="btn-danger" id="tradeCancel">İptal</button>
+          <button class="btn-primary" id="tradeConfirm">✓ Trade At</button>
+        </div>
+        <div class="trade-log" id="tradeLog"></div>
+      </div>
+    </div>
+  </div>
 
   <main>
     <section class="hero">
@@ -84,6 +181,11 @@
         <span class="stat-val" id="statTime">—</span>
         <span class="stat-label">last updated</span>
       </div>
+      <div class="stat-sep">|</div>
+      <div class="stat">
+        <span class="stat-val" id="statTrades">0</span>
+        <span class="stat-label">trades sent</span>
+      </div>
     </section>
 
     <section class="results" id="results">
@@ -100,6 +202,8 @@
     <span>Data from <a href="https://polymarket.com" target="_blank">Polymarket</a></span>
   </footer>
 
+  <!-- ethers.js for wallet address derivation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
