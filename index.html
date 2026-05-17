@@ -24,23 +24,49 @@
         Polymarket'ta zarar etmeden hacim kas.<br/>
         50/50'ye en yakın marketleri otomatik tara.
       </p>
+      <div class="splash-support-note">
+        💛 Bu araç tamamen <strong>ücretsiz</strong> — ücretli yapabilecekken bedava sunuyorum.<br/>
+        Destek olmak için X ve YouTube'u takip etmen yeterli.
+      </div>
       <div class="splash-steps">
         <div class="splash-step">① Her iki tarafa gir</div>
         <div class="splash-step">② Hacim ve aktivite biriktir</div>
         <div class="splash-step">③ $POLY airdrop'unu kazan</div>
       </div>
       <a class="btn-follow" href="https://x.com/FenasKripto" target="_blank" rel="noopener"
-         id="followBtn">
-        𝕏 &nbsp;@FenasKripto'yu Takip Et
+         id="followBtn" onclick="markVisited('x')">
+        𝕏 &nbsp;@FenasKripto'yu Takip Et &nbsp;<span class="check-x" id="checkX" style="display:none">✅</span>
       </a>
-      <a class="btn-youtube" href="https://www.youtube.com/@FenasKripto" target="_blank" rel="noopener">
+      <a class="btn-youtube" href="https://www.youtube.com/@FenasKripto" target="_blank" rel="noopener"
+         id="youtubeBtn" onclick="markVisited('yt')">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:middle;margin-right:6px"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.5 31.5 0 0 0 0 12a31.5 31.5 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.5 31.5 0 0 0 24 12a31.5 31.5 0 0 0-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>
-        YouTube Kanalımıza Abone Ol
+        YouTube Kanalına Abone Ol &nbsp;<span class="check-yt" id="checkYt" style="display:none">✅</span>
       </a>
-      <button class="btn-enter" id="enterBtn">Uygulamayı Aç →</button>
-      <p class="splash-note">Bu siteye çok emek verdim ve ücretli yapabilecekken ücretsiz sunuyorum. X ve YouTube hesabımı takip ederek destek olabilirsiniz 🙏</p>
+      <button class="btn-enter locked" id="enterBtn" disabled>
+        <span id="lockIcon">🔒</span> Uygulamayı Aç →
+      </button>
+      <p class="splash-note" id="splashHint">X ve YouTube'u ziyaret edince kilit açılır.</p>
     </div>
   </div>
+  <script>
+    var visitedX = false, visitedYt = false;
+    function markVisited(which) {
+      setTimeout(function() {
+        if (which === 'x') { visitedX = true; document.getElementById('checkX').style.display='inline'; }
+        if (which === 'yt') { visitedYt = true; document.getElementById('checkYt').style.display='inline'; }
+        if (visitedX && visitedYt) {
+          var btn = document.getElementById('enterBtn');
+          btn.disabled = false;
+          btn.classList.remove('locked');
+          document.getElementById('lockIcon').textContent = '🔓';
+          document.getElementById('splashHint').textContent = 'Teşekkürler! Uygulamaya girebilirsin 🙏';
+        }
+      }, 1500);
+    }
+    document.getElementById('enterBtn').addEventListener('click', function() {
+      if (!this.disabled) document.getElementById('splashOverlay').style.display = 'none';
+    });
+  </script>
 
   <header>
     <div class="logo">
