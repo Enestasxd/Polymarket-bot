@@ -50,8 +50,8 @@
   </div>
   <script>
     // Daha önce tamamladıysa splash'i gösterme
-    if (localStorage.getItem('polyhedge_unlocked') === '1') {
-      document.getElementById('splashOverlay').style.display = 'none';
+    if (localStorage.getItem('polyhedge_unlocked') !== '1') {
+      document.getElementById('splashOverlay').style.display = 'flex';
     }
     window.visitedX = false; window.visitedYt = false;
     function markVisited(which) {
