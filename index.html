@@ -49,27 +49,24 @@
     </div>
   </div>
   <script>
-    var visitedX = false, visitedYt = false;
+    window.visitedX = false; window.visitedYt = false;
     function markVisited(which) {
       setTimeout(function() {
-        if (which === 'x') { visitedX = true; document.getElementById('checkX').style.display='inline'; }
-        if (which === 'yt') { visitedYt = true; document.getElementById('checkYt').style.display='inline'; }
-        if (visitedX && visitedYt) {
+        if (which === 'x') { window.visitedX = true; document.getElementById('checkX').style.display='inline'; }
+        if (which === 'yt') { window.visitedYt = true; document.getElementById('checkYt').style.display='inline'; }
+        if (window.visitedX && window.visitedYt) {
           var btn = document.getElementById('enterBtn');
           btn.disabled = false;
           btn.classList.remove('locked');
           document.getElementById('lockIcon').textContent = '🔓';
           document.getElementById('splashHint').textContent = 'Teşekkürler! Uygulamaya girebilirsin 🙏';
-        } else if (visitedX && !visitedYt) {
+        } else if (window.visitedX && !window.visitedYt) {
           document.getElementById('splashHint').textContent = 'Şimdi de YouTube\'u takip et, kilit açılsın!';
-        } else if (!visitedX && visitedYt) {
+        } else if (!window.visitedX && window.visitedYt) {
           document.getElementById('splashHint').textContent = 'Şimdi de X\'i takip et, kilit açılsın!';
         }
       }, 3000);
     }
-    document.getElementById('enterBtn').addEventListener('click', function() {
-      if (!this.disabled) document.getElementById('splashOverlay').style.display = 'none';
-    });
   </script>
 
   <header>
