@@ -13,6 +13,52 @@ const CLOB_API   = 'https://clob.polymarket.com';
 const FETCH_LIMIT = 500;
 const REFRESH_INTERVAL = 30; // saniye
 const TAKER_FEE = 0.02; // %2 her iki taraf için
+const TWITTER_HANDLE = 'FenasKripto';
+const SITE_URL = 'https://polymarket-bot-lac.vercel.app';
+
+// ── Dil dosyası ──
+const i18n = {
+  tr: {
+    settings: '⚙ Ayarlar', tg_desc: 'Bot bir fırsat bulduğunda sana Telegram\'dan sorar.',
+    tg_token: 'Bot Token', tg_chat: 'Chat ID', tg_test: 'Test Mesajı Gönder',
+    wallet_a: 'Cüzdan A — YES tarafı', wallet_a_desc: 'Bu cüzdan YES pozisyonu alır.',
+    wallet_b: 'Cüzdan B — NO tarafı', wallet_b_desc: 'Bu cüzdan NO pozisyonu alır.',
+    pk: 'Private Key', addr: 'Adres (otomatik dolar)',
+    trade_amount: 'İşlem Tutarı', trade_amount_label: 'Her cüzdandan USDC miktarı ($)',
+    trade_amount_desc: 'Her iki cüzdana da bu kadar girilir. Toplam exposure: 2×',
+    save: 'Kaydet', pk_warning: '⚠ Private key\'ler sadece tarayıcı localStorage\'ında tutulur.',
+    trade_confirm: 'Trade Onayla', cancel: 'İptal', trade_send: '✓ Trade At',
+    hero_title: 'Her İki Tarafa Gir.<br/><em>Airdrop\'u Kazan.</em>',
+    hero_sub: 'Polymarket\'ta 50/50\'ye en yakın marketler. YES + NO al. Sıfır yönsel risk.',
+    max_dist: '50¢\'ye max uzaklık', expires: 'Bitiş süresi',
+    min_liq: 'Min likidite', scan: 'Marketleri Tara', all: 'Hepsi',
+    markets_scanned: 'market tarandı', matches: 'eşleşme bulundu',
+    best_spread: 'en iyi fark', last_updated: 'son güncelleme', trades_sent: 'trade gönderildi',
+    empty_state: '<strong>Marketleri Tara</strong>\'ya bas ve fırsatları bul.',
+    nfa: 'Finansal tavsiye değildir. Kendi araştırmanızı yapın.',
+    share: '𝕏 Paylaş',
+  },
+  en: {
+    settings: '⚙ Settings', tg_desc: 'Bot notifies you on Telegram when it finds an opportunity.',
+    tg_token: 'Bot Token', tg_chat: 'Chat ID', tg_test: 'Send Test Message',
+    wallet_a: 'Wallet A — YES side', wallet_a_desc: 'This wallet takes the YES position.',
+    wallet_b: 'Wallet B — NO side', wallet_b_desc: 'This wallet takes the NO position.',
+    pk: 'Private Key', addr: 'Address (auto-derived)',
+    trade_amount: 'Trade Amount', trade_amount_label: 'USDC per wallet ($)',
+    trade_amount_desc: 'Each wallet sends this amount. Total exposure: 2×',
+    save: 'Save', pk_warning: '⚠ Private keys are stored only in browser localStorage.',
+    trade_confirm: 'Confirm Trade', cancel: 'Cancel', trade_send: '✓ Execute',
+    hero_title: 'Hedge Both Sides.<br/><em>Farm the Airdrop.</em>',
+    hero_sub: 'Closest 50/50 markets on Polymarket — sorted by proximity. Buy YES + NO. Zero directional risk.',
+    max_dist: 'Max distance from 50¢', expires: 'Expires within',
+    min_liq: 'Min liquidity', scan: 'Scan Markets', all: 'All',
+    markets_scanned: 'markets scanned', matches: 'matches found',
+    best_spread: 'best spread', last_updated: 'last updated', trades_sent: 'trades sent',
+    empty_state: 'Hit <strong>Scan Markets</strong> to find opportunities.',
+    nfa: 'Not financial advice. Do your own research.',
+    share: '𝕏 Share',
+  }
+};
 
 // ── State ──
 let state = {
@@ -23,8 +69,10 @@ let state = {
   loading: false,
   refreshTimer: null,
   refreshSecondsLeft: REFRESH_INTERVAL,
-  tradeHistory: [],          // CSV için
-  pendingTrade: null,        // Telegram onayı bekleyen trade
+  tradeHistory: [],
+  pendingTrade: null,
+  lang: localStorage.getItem('polyhedge_lang') || 'tr',
+  theme: localStorage.getItem('polyhedge_theme') || 'dark',
   settings: loadSettings(),
 };
 
@@ -680,6 +728,7 @@ function renderResults(results) {
           </span>
           <div class="card-btns">
             <a class="btn-link" href="${r.url}" target="_blank" rel="noopener">Polymarket ↗</a>
+            <button class="btn-share" data-idx="${i}">𝕏 ${t('share')}</button>
             ${hasWallets ? `<button class="btn-trade" data-idx="${i}">⚡ Hedge</button>` : ''}
           </div>
         </div>
@@ -687,6 +736,14 @@ function renderResults(results) {
   }).join('');
 
   resultsEl.innerHTML = `<div class="cards-grid">${cards}</div>`;
+
+  // Share butonları
+  resultsEl.querySelectorAll('.btn-share').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      shareMarket(results[parseInt(btn.dataset.idx)]);
+    });
+  });
 
   // Hedge buton event'leri
   resultsEl.querySelectorAll('.btn-trade').forEach(btn => {
@@ -793,3 +850,69 @@ async function scan() {
 // Init: export butonu durumu
 if (state.tradeHistory.length > 0) exportBtn.style.display = 'block';
 document.getElementById('statTrades').textContent = state.tradeHistory.length;
+
+// ── Splash ──
+const splashOverlay = document.getElementById('splashOverlay');
+const enterBtn      = document.getElementById('enterBtn');
+const followBtn     = document.getElementById('followBtn');
+
+enterBtn.addEventListener('click', () => {
+  splashOverlay.classList.add('hidden');
+  setTimeout(() => splashOverlay.style.display = 'none', 400);
+});
+
+followBtn.addEventListener('click', () => {
+  // Takip sayfasını aç, 1 saniye sonra otomatik gir
+  setTimeout(() => {
+    splashOverlay.classList.add('hidden');
+    setTimeout(() => splashOverlay.style.display = 'none', 400);
+  }, 1000);
+});
+
+// ── Tema ──
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('themeBtn').textContent = theme === 'dark' ? '🌙' : '☀️';
+  localStorage.setItem('polyhedge_theme', theme);
+}
+
+document.getElementById('themeBtn').addEventListener('click', () => {
+  state.theme = state.theme === 'dark' ? 'light' : 'dark';
+  applyTheme(state.theme);
+});
+
+applyTheme(state.theme);
+
+// ── Dil ──
+function t(key) {
+  return i18n[state.lang][key] || i18n['en'][key] || key;
+}
+
+function applyLang(lang) {
+  state.lang = lang;
+  localStorage.setItem('polyhedge_lang', lang);
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const val = t(key);
+    if (val) el.innerHTML = val;
+  });
+  document.getElementById('langBtn').textContent = lang === 'tr' ? '🇹🇷' : '🇬🇧';
+  // Scan butonunu da güncelle
+  if (!state.loading) {
+    scanBtn.innerHTML = `<span class="scan-icon">⟳</span> ${t('scan')}`;
+  }
+}
+
+document.getElementById('langBtn').addEventListener('click', () => {
+  applyLang(state.lang === 'tr' ? 'en' : 'tr');
+});
+
+applyLang(state.lang);
+
+// ── Share Butonu ──
+function shareMarket(r) {
+  const cost  = r.cost.worst;
+  const text  = `🔀 PolyHedge fırsatı buldu!\n\n📌 ${r.question}\n\nYES ${r.yes}¢ · NO ${r.no}¢\nMax kayıp: $${cost} / $${(state.settings.tradeAmount||100)*2} hedge\n\n@Polymarket airdrop farming 🚀\n\n@${TWITTER_HANDLE} tarafından — ${SITE_URL}`;
+  const url   = `https://x.com/intent/tweet?text=${encodeURIComponent(text)}`;
+  window.open(url, '_blank', 'noopener');
+}
