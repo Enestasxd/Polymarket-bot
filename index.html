@@ -45,7 +45,7 @@
       <button class="btn-enter locked" id="enterBtn" disabled>
         <span id="lockIcon">🔒</span> Uygulamayı Aç →
       </button>
-      <p class="splash-note" id="splashHint">X ve YouTube'u ziyaret edince kilit açılır.</p>
+      <p class="splash-note" id="splashHint">Her ikisini de takip edince kilit açılır.</p>
     </div>
   </div>
   <script>
@@ -60,8 +60,12 @@
           btn.classList.remove('locked');
           document.getElementById('lockIcon').textContent = '🔓';
           document.getElementById('splashHint').textContent = 'Teşekkürler! Uygulamaya girebilirsin 🙏';
+        } else if (visitedX && !visitedYt) {
+          document.getElementById('splashHint').textContent = 'Şimdi de YouTube\'u takip et, kilit açılsın!';
+        } else if (!visitedX && visitedYt) {
+          document.getElementById('splashHint').textContent = 'Şimdi de X\'i takip et, kilit açılsın!';
         }
-      }, 1500);
+      }, 3000);
     }
     document.getElementById('enterBtn').addEventListener('click', function() {
       if (!this.disabled) document.getElementById('splashOverlay').style.display = 'none';
