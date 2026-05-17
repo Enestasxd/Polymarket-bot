@@ -446,9 +446,11 @@ footer a:hover { color: var(--text); }
 .btn-youtube:hover { opacity: 0.85; }
 
 .btn-enter.locked {
-  opacity: 0.4;
+  background: #2a2a2a !important;
+  color: #666 !important;
   cursor: not-allowed;
-  filter: grayscale(0.4);
+  border: 2px dashed #444;
+  box-shadow: none;
 }
 
 .splash-support-note {
