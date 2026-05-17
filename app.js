@@ -858,6 +858,7 @@ const followBtn     = document.getElementById('followBtn');
 
 enterBtn.addEventListener('click', () => {
   if (enterBtn.disabled || enterBtn.classList.contains('locked')) return;
+  if (!window.visitedX || !window.visitedYt) return;
   splashOverlay.classList.add('hidden');
   setTimeout(() => splashOverlay.style.display = 'none', 400);
 });
