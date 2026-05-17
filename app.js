@@ -588,7 +588,7 @@ function filterMarkets(markets) {
       cost,
       conditionId: m.conditionId || '',
       slug:        m.slug || '',
-      url:         `https://polymarket.com/event/${m.slug || ''}`,
+      url: `https://polymarket.com/event/${m.groupSlug || m.slug || ''}`,
     });
   }
   results.sort((a, b) => a.distance - b.distance || a.timeLeft.totalHours - b.timeLeft.totalHours);
