@@ -445,6 +445,27 @@ footer a:hover { color: var(--text); }
 }
 .btn-youtube:hover { opacity: 0.85; }
 
+.btn-enter.locked {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: grayscale(0.4);
+}
+
+.splash-support-note {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--fg);
+  line-height: 1.6;
+  margin-bottom: 4px;
+}
+[data-theme="light"] .splash-support-note {
+  background: rgba(0,0,0,0.05);
+  border-color: rgba(0,0,0,0.1);
+}
+
 .btn-enter {
   background: var(--accent);
   color: #0a0a0b;
