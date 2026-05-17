@@ -10,7 +10,7 @@
 
 const POLY_API   = 'https://gamma-api.polymarket.com/markets';
 const CLOB_API   = 'https://clob.polymarket.com';
-const FETCH_LIMIT = 500;
+const FETCH_LIMIT = 1000;
 const REFRESH_INTERVAL = 30; // saniye
 const TAKER_FEE = 0.02; // %2 her iki taraf için
 const TWITTER_HANDLE = 'FenasKripto';
