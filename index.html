@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PolyHedge — Risk-Free Volume Scanner</title>
-  <meta name="description" content="Find the closest 50/50 markets on Polymarket. Hedge both sides, farm volume, earn the airdrop." />
+  <meta name="description" content="Polymarket'ta en yakın 50/50 marketleri bul. Her iki tarafa gir, hacim kas, airdrop kazan." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -12,6 +12,31 @@
 </head>
 <body>
   <div class="noise"></div>
+
+  <!-- ── Splash Ekranı ── -->
+  <div class="splash-overlay" id="splashOverlay">
+    <div class="splash-box">
+      <div class="splash-logo">
+        <span class="logo-mark">◈</span>
+        <span class="logo-text">PolyHedge</span>
+      </div>
+      <p class="splash-desc">
+        Polymarket'ta zarar etmeden hacim kas.<br/>
+        50/50'ye en yakın marketleri otomatik tara.
+      </p>
+      <div class="splash-steps">
+        <div class="splash-step">① Her iki tarafa gir</div>
+        <div class="splash-step">② Hacim ve aktivite biriktir</div>
+        <div class="splash-step">③ $POLY airdrop'unu kazan</div>
+      </div>
+      <a class="btn-follow" href="https://x.com/FenasKripto" target="_blank" rel="noopener"
+         id="followBtn">
+        𝕏 &nbsp;@FenasKripto'yu Takip Et
+      </a>
+      <button class="btn-enter" id="enterBtn">Uygulamayı Aç →</button>
+      <p class="splash-note">Takip etmesen de açılır 😊 ama minnettar oluruz!</p>
+    </div>
+  </div>
 
   <header>
     <div class="logo">
@@ -22,7 +47,11 @@
       <span class="refresh-countdown" id="refreshCountdown"></span>
       <span class="live-dot" id="liveDot"></span>
       <span class="live-label">LIVE</span>
-      <button class="icon-btn" id="settingsBtn" title="Settings">⚙</button>
+      <!-- Dil toggle -->
+      <button class="icon-btn" id="langBtn" title="Dil / Language">🌐</button>
+      <!-- Karanlık/Aydınlık mod -->
+      <button class="icon-btn" id="themeBtn" title="Tema değiştir">🌙</button>
+      <button class="icon-btn" id="settingsBtn" title="Ayarlar">⚙</button>
       <button class="icon-btn export-btn" id="exportBtn" title="Export CSV" style="display:none">↓ CSV</button>
     </div>
   </header>
@@ -31,72 +60,61 @@
   <div class="modal-overlay" id="settingsOverlay">
     <div class="modal" id="settingsModal">
       <div class="modal-header">
-        <span class="modal-title">⚙ Settings</span>
+        <span class="modal-title" data-i18n="settings">⚙ Ayarlar</span>
         <button class="modal-close" id="settingsClose">✕</button>
       </div>
-
       <div class="modal-body">
-        <!-- Telegram -->
         <div class="settings-section">
           <div class="settings-section-title">📬 Telegram Onayı</div>
-          <p class="settings-desc">Bot bir fırsat bulduğunda sana Telegram'dan sorar. Sen onaylayınca trade atar.</p>
+          <p class="settings-desc" data-i18n="tg_desc">Bot bir fırsat bulduğunda sana Telegram'dan sorar. Sen onaylayınca trade atar.</p>
           <div class="input-group">
-            <label>Bot Token</label>
+            <label data-i18n="tg_token">Bot Token</label>
             <input type="text" id="tgToken" placeholder="1234567890:ABCdef..." autocomplete="off" />
           </div>
           <div class="input-group">
-            <label>Chat ID</label>
-            <input type="text" id="tgChatId" placeholder="-100123456789 veya kişisel ID" autocomplete="off" />
+            <label data-i18n="tg_chat">Chat ID</label>
+            <input type="text" id="tgChatId" placeholder="-100123456789" autocomplete="off" />
           </div>
-          <button class="btn-secondary" id="testTgBtn">Test Mesajı Gönder</button>
+          <button class="btn-secondary" id="testTgBtn" data-i18n="tg_test">Test Mesajı Gönder</button>
           <span class="tg-status" id="tgStatus"></span>
         </div>
-
-        <!-- Wallet A -->
         <div class="settings-section">
-          <div class="settings-section-title">💼 Cüzdan A — YES tarafı</div>
-          <p class="settings-desc">Bu cüzdan YES pozisyonu alır.</p>
+          <div class="settings-section-title">💼 <span data-i18n="wallet_a">Cüzdan A — YES tarafı</span></div>
+          <p class="settings-desc" data-i18n="wallet_a_desc">Bu cüzdan YES pozisyonu alır.</p>
           <div class="input-group">
-            <label>Private Key</label>
+            <label data-i18n="pk">Private Key</label>
             <input type="password" id="walletAKey" placeholder="0x..." autocomplete="off" />
           </div>
           <div class="input-group">
-            <label>Adres (otomatik dolar)</label>
+            <label data-i18n="addr">Adres (otomatik dolar)</label>
             <input type="text" id="walletAAddr" placeholder="0x..." readonly />
           </div>
         </div>
-
-        <!-- Wallet B -->
         <div class="settings-section">
-          <div class="settings-section-title">💼 Cüzdan B — NO tarafı</div>
-          <p class="settings-desc">Bu cüzdan NO pozisyonu alır. Farklı IP / cihazdan fund'lanmış olmalı.</p>
+          <div class="settings-section-title">💼 <span data-i18n="wallet_b">Cüzdan B — NO tarafı</span></div>
+          <p class="settings-desc" data-i18n="wallet_b_desc">Bu cüzdan NO pozisyonu alır. Farklı IP / cihazdan fund'lanmış olmalı.</p>
           <div class="input-group">
-            <label>Private Key</label>
+            <label data-i18n="pk">Private Key</label>
             <input type="password" id="walletBKey" placeholder="0x..." autocomplete="off" />
           </div>
           <div class="input-group">
-            <label>Adres (otomatik dolar)</label>
+            <label data-i18n="addr">Adres (otomatik dolar)</label>
             <input type="text" id="walletBAddr" placeholder="0x..." readonly />
           </div>
         </div>
-
-        <!-- Trade Amount -->
         <div class="settings-section">
-          <div class="settings-section-title">💰 İşlem Tutarı</div>
+          <div class="settings-section-title">💰 <span data-i18n="trade_amount">İşlem Tutarı</span></div>
           <div class="input-group">
-            <label>Her cüzdandan USDC miktarı ($)</label>
+            <label data-i18n="trade_amount_label">Her cüzdandan USDC miktarı ($)</label>
             <input type="number" id="tradeAmount" value="100" min="10" max="500" />
           </div>
-          <p class="settings-desc">Her iki cüzdana da bu kadar girilir. Toplam exposure: 2×</p>
+          <p class="settings-desc" data-i18n="trade_amount_desc">Her iki cüzdana da bu kadar girilir. Toplam exposure: 2×</p>
         </div>
-
         <div class="modal-actions">
-          <button class="btn-primary" id="saveSettingsBtn">Kaydet</button>
+          <button class="btn-primary" id="saveSettingsBtn" data-i18n="save">Kaydet</button>
         </div>
-
-        <div class="settings-warning">
+        <div class="settings-warning" data-i18n="pk_warning">
           ⚠ Private key'ler sadece tarayıcı localStorage'ında tutulur, hiçbir sunucuya gönderilmez.
-          Yine de bu aracı sadece kendi bilgisayarında çalıştır; paylaşılan / public cihazlarda kullanma.
         </div>
       </div>
     </div>
@@ -106,15 +124,15 @@
   <div class="modal-overlay" id="tradeOverlay">
     <div class="modal" id="tradeModal">
       <div class="modal-header">
-        <span class="modal-title">🔀 Trade Onayla</span>
+        <span class="modal-title">🔀 <span data-i18n="trade_confirm">Trade Onayla</span></span>
         <button class="modal-close" id="tradeClose">✕</button>
       </div>
       <div class="modal-body">
         <div class="trade-market-q" id="tradeQuestion"></div>
         <div class="trade-details" id="tradeDetails"></div>
         <div class="trade-actions">
-          <button class="btn-danger" id="tradeCancel">İptal</button>
-          <button class="btn-primary" id="tradeConfirm">✓ Trade At</button>
+          <button class="btn-danger" id="tradeCancel" data-i18n="cancel">İptal</button>
+          <button class="btn-primary" id="tradeConfirm" data-i18n="trade_send">✓ Trade At</button>
         </div>
         <div class="trade-log" id="tradeLog"></div>
       </div>
@@ -123,32 +141,31 @@
 
   <main>
     <section class="hero">
-      <h1>Hedge Both Sides.<br /><em>Farm the Airdrop.</em></h1>
-      <p class="hero-sub">
-        Closest 50/50 markets on Polymarket — sorted by proximity, filtered by liquidity.
-        Buy YES + NO on the same market. Zero directional risk.
+      <h1 data-i18n="hero_title">Hedge Both Sides.<br /><em>Farm the Airdrop.</em></h1>
+      <p class="hero-sub" data-i18n="hero_sub">
+        Polymarket'ta 50/50'ye en yakın marketler — yakınlığa ve likiditeye göre sıralı.
+        YES + NO al. Sıfır yönsel risk.
       </p>
-
       <div class="controls">
         <div class="control-group">
-          <label>Max distance from 50¢</label>
+          <label data-i18n="max_dist">Max distance from 50¢</label>
           <div class="slider-row">
             <input type="range" id="distanceSlider" min="1" max="20" value="10" />
             <span class="slider-val" id="distanceVal">10¢</span>
           </div>
         </div>
         <div class="control-group">
-          <label>Expires within</label>
+          <label data-i18n="expires">Expires within</label>
           <div class="pill-group" id="daysFilter">
             <button class="pill" data-days="1">24h</button>
             <button class="pill" data-days="3">3d</button>
             <button class="pill active" data-days="7">7d</button>
             <button class="pill" data-days="30">30d</button>
-            <button class="pill" data-days="9999">All</button>
+            <button class="pill" data-days="9999" data-i18n="all">All</button>
           </div>
         </div>
         <div class="control-group">
-          <label>Min liquidity</label>
+          <label data-i18n="min_liq">Min liquidity</label>
           <div class="pill-group" id="liqFilter">
             <button class="pill active" data-liq="5000">$5K</button>
             <button class="pill" data-liq="10000">$10K</button>
@@ -156,7 +173,7 @@
           </div>
         </div>
         <button class="scan-btn" id="scanBtn">
-          <span class="scan-icon">⟳</span> Scan Markets
+          <span class="scan-icon">⟳</span> <span data-i18n="scan">Scan Markets</span>
         </button>
       </div>
     </section>
@@ -164,45 +181,46 @@
     <section class="stats-bar" id="statsBar" style="display:none">
       <div class="stat">
         <span class="stat-val" id="statTotal">—</span>
-        <span class="stat-label">markets scanned</span>
+        <span class="stat-label" data-i18n="markets_scanned">markets scanned</span>
       </div>
       <div class="stat-sep">|</div>
       <div class="stat">
         <span class="stat-val" id="statFound">—</span>
-        <span class="stat-label">matches found</span>
+        <span class="stat-label" data-i18n="matches">matches found</span>
       </div>
       <div class="stat-sep">|</div>
       <div class="stat">
         <span class="stat-val" id="statBest">—</span>
-        <span class="stat-label">best spread</span>
+        <span class="stat-label" data-i18n="best_spread">best spread</span>
       </div>
       <div class="stat-sep">|</div>
       <div class="stat">
         <span class="stat-val" id="statTime">—</span>
-        <span class="stat-label">last updated</span>
+        <span class="stat-label" data-i18n="last_updated">last updated</span>
       </div>
       <div class="stat-sep">|</div>
       <div class="stat">
         <span class="stat-val" id="statTrades">0</span>
-        <span class="stat-label">trades sent</span>
+        <span class="stat-label" data-i18n="trades_sent">trades sent</span>
       </div>
     </section>
 
     <section class="results" id="results">
       <div class="empty-state" id="emptyState">
         <div class="empty-icon">◈</div>
-        <p>Hit <strong>Scan Markets</strong> to find opportunities.</p>
+        <p data-i18n="empty_state">Hit <strong>Scan Markets</strong> to find opportunities.</p>
       </div>
     </section>
   </main>
 
   <footer>
-    <span>Not financial advice. Do your own research.</span>
+    <span data-i18n="nfa">Not financial advice. Do your own research.</span>
     <span class="footer-sep">·</span>
     <span>Data from <a href="https://polymarket.com" target="_blank">Polymarket</a></span>
+    <span class="footer-sep">·</span>
+    <a href="https://x.com/FenasKripto" target="_blank" rel="noopener" class="footer-x">𝕏 @FenasKripto</a>
   </footer>
 
-  <!-- ethers.js for wallet address derivation -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
   <script src="app.js"></script>
 </body>
