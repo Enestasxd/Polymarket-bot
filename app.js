@@ -857,16 +857,9 @@ const enterBtn      = document.getElementById('enterBtn');
 const followBtn     = document.getElementById('followBtn');
 
 enterBtn.addEventListener('click', () => {
+  if (enterBtn.disabled || enterBtn.classList.contains('locked')) return;
   splashOverlay.classList.add('hidden');
   setTimeout(() => splashOverlay.style.display = 'none', 400);
-});
-
-followBtn.addEventListener('click', () => {
-  // Takip sayfasını aç, 1 saniye sonra otomatik gir
-  setTimeout(() => {
-    splashOverlay.classList.add('hidden');
-    setTimeout(() => splashOverlay.style.display = 'none', 400);
-  }, 1000);
 });
 
 // ── Tema ──
