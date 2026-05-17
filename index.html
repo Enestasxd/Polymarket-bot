@@ -49,6 +49,10 @@
     </div>
   </div>
   <script>
+    // Daha önce tamamladıysa splash'i gösterme
+    if (localStorage.getItem('polyhedge_unlocked') === '1') {
+      document.getElementById('splashOverlay').style.display = 'none';
+    }
     window.visitedX = false; window.visitedYt = false;
     function markVisited(which) {
       setTimeout(function() {
